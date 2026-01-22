@@ -1898,7 +1898,29 @@ function renderDashboard() {
     </div>
   `;
 }
+/* ================= ADD BRANCH ================= */
+function addBranch() {
+  const input = document.getElementById('newBranchName');
+  if (!input) return;
 
+  const name = input.value.trim();
+  if (!name) {
+    alert('กรุณาใส่ชื่อสาขา');
+    return;
+  }
+
+  if (branches.includes(name)) {
+    alert('สาขานี้มีอยู่แล้ว');
+    return;
+  }
+
+  branches.push(name);
+  input.value = '';
+
+  saveCredentials();          // 🔥 บันทึกลง Firebase
+  updateBranchDropdowns();    // อัปเดต dropdown
+  renderBranchList();         // รีเฟรชรายการใน modal
+}
 /* ================= BRANCH ================= */
 function renderBranchList() {
   branchList.innerHTML = '';
