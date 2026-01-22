@@ -1787,6 +1787,175 @@ function handleImport(input) {
   };
   reader.readAsText(file);
 }
+/* ================= LOGIN ALERT ================= */
+function showLoginAlert(message, type = 'danger') {
+  const box = document.getElementById('loginAlert');
+  if (!box) return;
+  box.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+  setTimeout(() => box.innerHTML = '', 3000);
+}
+
+/* ================= MODALS ================= */
+function openAddModal() {
+  credentialForm.reset();
+  credentialId.value = '';
+  modalTitle.innerText = 'เพิ่มข้อมูลใหม่';
+  credentialModal.classList.add('active');
+}
+function closeModal() {
+  credentialModal.classList.remove('active');
+}
+function openBranchManager() {
+  branchModal.classList.add('active');
+  renderBranchList();
+}
+function closeBranchModal() {
+  branchModal.classList.remove('active');
+}
+function openUserGuide() {
+  userGuideModal.classList.add('active');
+}
+function closeUserGuide() {
+  userGuideModal.classList.remove('active');
+}
+function openUserGuideFromLogin() {
+  openUserGuide();
+}
+
+/* ================= VIEW ================= */
+function switchView(view) {
+  currentView = view;
+  dashboardView.classList.toggle('hidden', view !== 'dashboard');
+  credentialsView.classList.toggle('hidden', view !== 'credentials');
+  document.querySelectorAll('.view-tab').forEach(v => v.classList.remove('active'));
+  document.querySelector(`.view-tab[onclick*="${view}"]`).classList.add('active');
+  view === 'dashboard' ? renderDashboard() : renderCredentials();
+}
+
+/* ================= FILTER ================= */
+function filterCategory(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-category="${cat}"]`).classList.add('active');
+  renderCredentials();
+}
+function filterByBranch() {
+  currentBranchFilter = branchFilter.value;
+  renderCredentials();
+}
+function clearSearch() {
+  searchInput.value = '';
+  currentSearch = '';
+  renderCredentials();
+}
+
+/* ================= RENDER ================= */
+function renderCredentials() {
+  credentialsGrid.innerHTML = '';
+  let list = credentials.filter(c => {
+    if (currentFilter !== 'all' && c.category !== currentFilter) return false;
+    if (currentBranchFilter !== 'all' && c.branch !== currentBranchFilter) return false;
+    if (currentSearch) {
+      const s = currentSearch;
+      return Object.values(c).join(' ').toLowerCase().includes(s);
+    }
+    return true;
+  });
+
+  if (!list.length) {
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+
+  list.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'credential-card';
+    el.innerHTML = `
+      <div class="credential-header">
+        <div>
+          <div class="credential-title">${c.title}</div>
+          <span class="branch-badge">${c.branch}</span>
+        </div>
+        <span class="credential-category">${c.category}</span>
+      </div>
+      <div><b>User:</b> ${c.username || '-'}</div>
+      <div><b>Password:</b> ********</div>
+      <div class="credential-actions">
+        <button class="btn btn-sm btn-warning" onclick="editCredential('${c.id}')">✏️</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCredential('${c.id}')">🗑️</button>
+      </div>
+    `;
+    credentialsGrid.appendChild(el);
+  });
+}
+
+function renderDashboard() {
+  dashboardView.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">${credentials.length}</div><div class="stat-label">รายการ</div></div>
+      <div class="stat-card"><div class="stat-value">${branches.length}</div><div class="stat-label">สาขา</div></div>
+    </div>
+  `;
+}
+
+/* ================= BRANCH ================= */
+function renderBranchList() {
+  branchList.innerHTML = '';
+  branches.forEach((b,i) => {
+    const d = document.createElement('div');
+    d.className = 'branch-item';
+    d.innerHTML = `<span>${b}</span>
+      <button class="btn btn-sm btn-danger" onclick="deleteBranch(${i})">🗑️</button>`;
+    branchList.appendChild(d);
+  });
+}
+function deleteBranch(i) {
+  branches.splice(i,1);
+  saveCredentials();
+  updateBranchDropdowns();
+  renderBranchList();
+}
+function updateBranchDropdowns() {
+  branch.innerHTML = '<option value="">-- เลือกสาขา --</option>';
+  branchFilter.innerHTML = '<option value="all">-- ทุกสาขา --</option>';
+  branches.forEach(b => {
+    branch.innerHTML += `<option value="${b}">${b}</option>`;
+    branchFilter.innerHTML += `<option value="${b}">${b}</option>`;
+  });
+}
+
+/* ================= OTHER ================= */
+function editCredential(id) {
+  const c = credentials.find(x => x.id === id);
+  if (!c) return;
+  Object.keys(c).forEach(k => {
+    if (document.getElementById(k)) document.getElementById(k).value = c[k];
+  });
+  credentialId.value = c.id;
+  modalTitle.innerText = 'แก้ไขข้อมูล';
+  credentialModal.classList.add('active');
+}
+function exportData() {
+  const blob = new Blob([JSON.stringify(credentials,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'backup.json';
+  a.click();
+}
+function importData() {
+  importFile.click();
+}
+function handleImport(input) {
+  const r = new FileReader();
+  r.onload = e => {
+    credentials = JSON.parse(e.target.result);
+    saveCredentials();
+    renderCredentials();
+    renderDashboard();
+  };
+  r.readAsText(input.files[0]);
+}
 </script>
 
 </body>
