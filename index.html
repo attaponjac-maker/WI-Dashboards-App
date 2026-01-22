@@ -1403,7 +1403,7 @@
 <script>
 /* ================= FIREBASE CONFIG ================= */
 
-  const firebaseConfig = {
+  var firebaseConfig = {
   apiKey: "AIzaSyC_e4e5PVTVgGGUXNnxk_i0capzW1vUHAA",
   authDomain: "wi-dashbord-app.firebaseapp.com",
   projectId: "wi-dashbord-app",
@@ -1413,8 +1413,8 @@
 };
 
 firebase.initializeApp(firebaseConfig);https://github.com/attaponjac-maker/WI-Dashboards-App/blob/main/index.html
-const auth = firebase.auth();
-const db = firebase.firestore();
+var auth = firebase.auth();
+var db = firebase.firestore();
 
 /* ================= GLOBAL STATE ================= */
 var credentials = [];
@@ -1430,7 +1430,7 @@ function encrypt(text, password) {
 }
 function decrypt(cipher, password) {
   try {
-    const bytes = CryptoJS.AES.decrypt(cipher, password);
+    var bytes = CryptoJS.AES.decrypt(cipher, password);
     return bytes.toString(CryptoJS.enc.Utf8);
   } catch {
     return '';
@@ -1443,8 +1443,8 @@ document.getElementById('loginForm').addEventListener('submit', handleLogin);
 function handleLogin(e) {
   e.preventDefault();
 
-  const email = loginEmail.value;
-  const password = masterPassword.value;
+  var email = loginEmail.value;
+  var password = masterPassword.value;
 
   auth.signInWithEmailAndPassword(email, password)
     .then(() => {
@@ -1480,11 +1480,11 @@ function showLoginAlert(msg, type) {
 
 /* ================= FIRESTORE DATA ================= */
 async function loadCredentials() {
-  const uid = auth.currentUser.uid;
-  const doc = await db.collection('passwords').doc(uid).get();
+  var uid = auth.currentUser.uid;
+  var doc = await db.collection('passwords').doc(uid).get();
 
   if (doc.exists) {
-    const decrypted = decrypt(doc.data().data, sessionPassword);
+    var decrypted = decrypt(doc.data().data, sessionPassword);
     credentials = decrypted ? JSON.parse(decrypted) : [];
   } else {
     credentials = [];
@@ -1493,8 +1493,8 @@ async function loadCredentials() {
 }
 
 async function saveCredentials() {
-  const uid = auth.currentUser.uid;
-  const encrypted = encrypt(JSON.stringify(credentials), sessionPassword);
+  var uid = auth.currentUser.uid;
+  var encrypted = encrypt(JSON.stringify(credentials), sessionPassword);
   await db.collection('passwords').doc(uid).set({
     data: encrypted,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1503,8 +1503,8 @@ async function saveCredentials() {
 
 /* ================= BRANCH ================= */
 async function loadBranches() {
-  const uid = auth.currentUser.uid;
-  const doc = await db.collection('branches').doc(uid).get();
+  var uid = auth.currentUser.uid;
+  var doc = await db.collection('branches').doc(uid).get();
 
   if (doc.exists) {
     branches = doc.data().list;
@@ -1515,7 +1515,7 @@ async function loadBranches() {
 }
 
 async function saveBranches() {
-  const uid = auth.currentUser.uid;
+  var uid = auth.currentUser.uid;
   await db.collection('branches').doc(uid).set({ list: branches });
 }
 
@@ -1532,13 +1532,6 @@ function logout() {
 /* ================= RENDER ================= */
 /* ฟังก์ชัน render / dashboard / CRUD ของคุณ ใช้ต่อได้ทั้งหมด */
         // Global State
-        let masterPasswordHash = localStorage.getItem('masterPasswordHash');
-        let credentials = [];
-        let branches = [];
-        let currentFilter = 'all';
-        let currentBranchFilter = 'all';
-        let currentSearch = '';
-        let currentView = 'dashboard';
 
         // Initialize
         document.getElementById('loginForm').addEventListener('submit', handleLogin);
@@ -1551,8 +1544,8 @@ function logout() {
         // Login Handler
         function handleLogin(e) {
             e.preventDefault();
-            const password = document.getElementById('masterPassword').value;
-            const hash = CryptoJS.SHA256(password).toString();
+            var password = document.getElementById('masterPassword').value;
+            var hash = CryptoJS.SHA256(password).toString();
 
             if (!masterPasswordHash) {
                 // First time setup
@@ -1579,7 +1572,7 @@ function logout() {
         }
 
         function showLoginAlert(message, type) {
-            const alert = document.getElementById('loginAlert');
+            var alert = document.getElementById('loginAlert');
             alert.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
             setTimeout(() => alert.innerHTML = '', 3000);
         }
@@ -1591,7 +1584,7 @@ function logout() {
 
         function decrypt(ciphertext, password) {
             try {
-                const bytes = CryptoJS.AES.decrypt(ciphertext, password);
+                var bytes = CryptoJS.AES.decrypt(ciphertext, password);
                 return bytes.toString(CryptoJS.enc.Utf8);
             } catch {
                 return '';
@@ -1600,9 +1593,9 @@ function logout() {
 
         // Load Credentials
         function loadCredentials() {
-            const encrypted = localStorage.getItem('credentials');
+            var encrypted = localStorage.getItem('credentials');
             if (encrypted) {
-                const decrypted = decrypt(encrypted, window.sessionPassword);
+                var decrypted = decrypt(encrypted, window.sessionPassword);
                 credentials = decrypted ? JSON.parse(decrypted) : [];
             }
             renderCredentials();
@@ -1610,20 +1603,20 @@ function logout() {
 
         // Save Credentials
         function saveCredentials() {
-            const json = JSON.stringify(credentials);
-            const encrypted = encrypt(json, window.sessionPassword);
+            var json = JSON.stringify(credentials);
+            var encrypted = encrypt(json, window.sessionPassword);
             localStorage.setItem('credentials', encrypted);
         }
 
         // Render Credentials
         function renderCredentials() {
-            const grid = document.getElementById('credentialsGrid');
-            const emptyState = document.getElementById('emptyState');
+            var grid = document.getElementById('credentialsGrid');
+            var emptyState = document.getElementById('emptyState');
 
             let filtered = credentials.filter(c => {
-                const matchCategory = currentFilter === 'all' || c.category === currentFilter;
-                const matchBranch = currentBranchFilter === 'all' || c.branch === currentBranchFilter;
-                const matchSearch = !currentSearch ||
+                var matchCategory = currentFilter === 'all' || c.category === currentFilter;
+                var matchBranch = currentBranchFilter === 'all' || c.branch === currentBranchFilter;
+                var matchSearch = !currentSearch ||
                     c.title.toLowerCase().includes(currentSearch) ||
                     (c.url && c.url.toLowerCase().includes(currentSearch)) ||
                     (c.username && c.username.toLowerCase().includes(currentSearch)) ||
@@ -1640,7 +1633,7 @@ function logout() {
 
             emptyState.classList.add('hidden');
             grid.innerHTML = filtered.map(c => {
-                const categoryIcon = {
+                var categoryIcon = {
                     'google-workspace': '🌐',
                     'website': '💻',
                     'cctv': '📹',
@@ -1649,7 +1642,7 @@ function logout() {
                     'etc': '📦'
                 }[c.category] || '📋';
 
-                const categoryName = {
+                var categoryName = {
                     'google-workspace': 'Google Workspace',
                     'website': 'Website',
                     'cctv': 'CCTV',
@@ -1658,7 +1651,7 @@ function logout() {
                     'etc': 'อื่นๆ'
                 }[c.category] || 'ทั่วไป';
 
-                const expiryWarning = getExpiryWarning(c.expiryDate);
+                var expiryWarning = getExpiryWarning(c.expiryDate);
 
                 return `
                     <div class="credential-card">
@@ -1760,7 +1753,7 @@ function logout() {
 
         // Edit Credential
         function editCredential(id) {
-            const cred = credentials.find(c => c.id === id);
+            var cred = credentials.find(c => c.id === id);
             if (!cred) return;
 
             document.getElementById('modalTitle').textContent = 'แก้ไขข้อมูล';
@@ -1781,8 +1774,8 @@ function logout() {
         function handleSaveCredential(e) {
             e.preventDefault();
 
-            const id = document.getElementById('credentialId').value || Date.now().toString();
-            const credential = {
+            var id = document.getElementById('credentialId').value || Date.now().toString();
+            var credential = {
                 id,
                 branch: document.getElementById('branch').value,
                 category: document.getElementById('category').value,
@@ -1795,7 +1788,7 @@ function logout() {
                 updatedAt: new Date().toISOString()
             };
 
-            const index = credentials.findIndex(c => c.id === id);
+            var index = credentials.findIndex(c => c.id === id);
             if (index >= 0) {
                 credentials[index] = credential;
             } else {
@@ -1837,7 +1830,7 @@ function logout() {
         }
 
         function copyPassword(id) {
-            const cred = credentials.find(c => c.id === id);
+            var cred = credentials.find(c => c.id === id);
             if (cred && cred.password) {
                 navigator.clipboard.writeText(cred.password).then(() => {
                     alert('🔐 คัดลอกรหัสผ่านแล้ว!');
@@ -1850,19 +1843,19 @@ function logout() {
 
         // Toggle Password Visibility
         function togglePwd(id) {
-            const input = document.getElementById(`pwd-${id}`);
+            var input = document.getElementById(`pwd-${id}`);
             input.type = input.type === 'password' ? 'text' : 'password';
         }
 
         function togglePasswordVisibility() {
-            const input = document.getElementById('password');
+            var input = document.getElementById('password');
             input.type = input.type === 'password' ? 'text' : 'password';
         }
 
         // Generate Password
         function generatePassword() {
-            const length = 16;
-            const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+            var length = 16;
+            var charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
             let password = '';
             for (let i = 0; i < length; i++) {
                 password += charset.charAt(Math.floor(Math.random() * charset.length));
@@ -1872,15 +1865,15 @@ function logout() {
 
         // Export Data
         function exportData() {
-            const data = {
+            var data = {
                 version: '1.0',
                 exportDate: new Date().toISOString(),
                 credentials: credentials
             };
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            var json = JSON.stringify(data, null, 2);
+            var blob = new Blob([json], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
             a.href = url;
             a.download = `password-manager-backup-${Date.now()}.json`;
             a.click();
@@ -1892,13 +1885,13 @@ function logout() {
         }
 
         function handleImport(input) {
-            const file = input.files[0];
+            var file = input.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
+            var reader = new FileReader();
             reader.onload = (e) => {
                 try {
-                    const data = JSON.parse(e.target.result);
+                    var data = JSON.parse(e.target.result);
                     if (data.credentials && Array.isArray(data.credentials)) {
                         if (confirm(`พบข้อมูล ${data.credentials.length} รายการ\nนำเข้าข้อมูลทั้งหมด?`)) {
                             credentials = data.credentials;
@@ -1949,10 +1942,10 @@ function logout() {
 
         // Dashboard Rendering
         function renderDashboard() {
-            const dashboardView = document.getElementById('dashboardView');
+            var dashboardView = document.getElementById('dashboardView');
 
             // Calculate statistics
-            const stats = {
+            var stats = {
                 total: credentials.length,
                 byCategory: {},
                 byBranch: {},
@@ -1962,7 +1955,7 @@ function logout() {
             };
 
             // Count by category
-            const categories = ['google-workspace', 'website', 'cctv', 'network', 'server', 'etc'];
+            var categories = ['google-workspace', 'website', 'cctv', 'network', 'server', 'etc'];
             categories.forEach(cat => {
                 stats.byCategory[cat] = credentials.filter(c => c.category === cat).length;
             });
@@ -1973,11 +1966,11 @@ function logout() {
             });
 
             // Check expiry dates
-            const now = new Date();
+            var now = new Date();
             credentials.forEach(c => {
                 if (c.expiryDate) {
-                    const expiry = new Date(c.expiryDate);
-                    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                    var expiry = new Date(c.expiryDate);
+                    var diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
 
                     if (diffDays < 0) {
                         stats.expired++;
@@ -2053,7 +2046,7 @@ function logout() {
         }
 
         function renderCategoryChart(byCategory, total) {
-            const categoryNames = {
+            var categoryNames = {
                 'google-workspace': '🌐 Google Workspace',
                 'website': '💻 Website',
                 'cctv': '📹 CCTV',
@@ -2066,7 +2059,7 @@ function logout() {
                 .filter(([cat, count]) => count > 0)
                 .sort((a, b) => b[1] - a[1])
                 .map(([cat, count]) => {
-                    const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                    var percentage = total > 0 ? Math.round((count / total) * 100) : 0;
                     return `
                         <div class="chart-item">
                             <div style="flex: 1;">
@@ -2086,7 +2079,7 @@ function logout() {
                 .filter(([branch, count]) => count > 0)
                 .sort((a, b) => b[1] - a[1])
                 .map(([branch, count]) => {
-                    const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                    var percentage = total > 0 ? Math.round((count / total) * 100) : 0;
                     return `
                         <div class="chart-item">
                             <div style="flex: 1;">
@@ -2106,7 +2099,7 @@ function logout() {
                 return '<p style="color: var(--text-light); text-align: center; padding: 20px;">ยังไม่มีรายการอัปเดต</p>';
             }
 
-            const categoryIcons = {
+            var categoryIcons = {
                 'google-workspace': '🌐',
                 'website': '💻',
                 'cctv': '📹',
@@ -2116,15 +2109,15 @@ function logout() {
             };
 
             return recent.map(c => {
-                const icon = categoryIcons[c.category] || '📋';
-                const timeAgo = c.updatedAt ? getTimeAgo(c.updatedAt) : 'ไม่ทราบ';
+                var icon = categoryIcons[c.category] || '📋';
+                var timeAgo = c.updatedAt ? getTimeAgo(c.updatedAt) : 'ไม่ทราบ';
 
                 // Determine status
                 let statusBadge = '';
                 if (c.expiryDate) {
-                    const expiry = new Date(c.expiryDate);
-                    const now = new Date();
-                    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+                    var expiry = new Date(c.expiryDate);
+                    var now = new Date();
+                    var diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
 
                     if (diffDays < 0) {
                         statusBadge = '<span class="status-badge status-danger">หมดอายุ</span>';
@@ -2151,12 +2144,12 @@ function logout() {
         }
 
         function getTimeAgo(dateStr) {
-            const now = new Date();
-            const date = new Date(dateStr);
-            const diffMs = now - date;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMs / 3600000);
-            const diffDays = Math.floor(diffMs / 86400000);
+            var now = new Date();
+            var date = new Date(dateStr);
+            var diffMs = now - date;
+            var diffMins = Math.floor(diffMs / 60000);
+            var diffHours = Math.floor(diffMs / 3600000);
+            var diffDays = Math.floor(diffMs / 86400000);
 
             if (diffMins < 1) return 'เมื่อสักครู่';
             if (diffMins < 60) return `${diffMins} นาทีที่แล้ว`;
@@ -2172,7 +2165,7 @@ function logout() {
 
         // Branch Management
         function loadBranches() {
-            const saved = localStorage.getItem('branches');
+            var saved = localStorage.getItem('branches');
             if (saved) {
                 branches = JSON.parse(saved);
             } else {
@@ -2195,12 +2188,12 @@ function logout() {
 
         function updateBranchDropdowns() {
             // Update branch filter dropdown
-            const filterSelect = document.getElementById('branchFilter');
+            var filterSelect = document.getElementById('branchFilter');
             filterSelect.innerHTML = '<option value="all">-- ทุกสาขา --</option>' +
                 branches.map(b => `<option value="${b}">${b}</option>`).join('');
 
             // Update branch selector in form
-            const branchSelect = document.getElementById('branch');
+            var branchSelect = document.getElementById('branch');
             branchSelect.innerHTML = '<option value="">-- เลือกสาขา --</option>' +
                 branches.map(b => `<option value="${b}">${b}</option>`).join('');
         }
@@ -2221,7 +2214,7 @@ function logout() {
         }
 
         function renderBranchList() {
-            const list = document.getElementById('branchList');
+            var list = document.getElementById('branchList');
 
             if (branches.length === 0) {
                 list.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">ยังไม่มีสาขา</p>';
@@ -2229,7 +2222,7 @@ function logout() {
             }
 
             // Count credentials per branch
-            const branchCounts = {};
+            var branchCounts = {};
             credentials.forEach(c => {
                 if (c.branch) {
                     branchCounts[c.branch] = (branchCounts[c.branch] || 0) + 1;
@@ -2237,7 +2230,7 @@ function logout() {
             });
 
             list.innerHTML = branches.map((branch, index) => {
-                const count = branchCounts[branch] || 0;
+                var count = branchCounts[branch] || 0;
                 return `
                     <div class="branch-item">
                         <div>
@@ -2251,7 +2244,7 @@ function logout() {
         }
 
         function addBranch() {
-            const name = document.getElementById('newBranchName').value.trim();
+            var name = document.getElementById('newBranchName').value.trim();
 
             if (!name) {
                 alert('กรุณากรอกชื่อสาขา');
@@ -2278,10 +2271,10 @@ function logout() {
         }
 
         function deleteBranch(index) {
-            const branch = branches[index];
+            var branch = branches[index];
 
             // Check if branch is in use
-            const inUse = credentials.some(c => c.branch === branch);
+            var inUse = credentials.some(c => c.branch === branch);
 
             if (inUse) {
                 if (!confirm(`สาขา "${branch}" มีข้อมูลอยู่ ${credentials.filter(c => c.branch === branch).length} รายการ\nต้องการลบสาขานี้? (ข้อมูลจะยังอยู่แต่ไม่มีสาขา)`)) {
@@ -2326,7 +2319,7 @@ function logout() {
         }
 
         function scrollToSection(sectionId) {
-            const section = document.getElementById(sectionId);
+            var section = document.getElementById(sectionId);
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
@@ -2335,7 +2328,7 @@ function logout() {
         // Utility Functions
         function formatDate(dateStr) {
             if (!dateStr) return '';
-            const date = new Date(dateStr);
+            var date = new Date(dateStr);
             return date.toLocaleDateString('th-TH', {
                 year: 'numeric',
                 month: 'long',
@@ -2346,9 +2339,9 @@ function logout() {
         function getExpiryWarning(dateStr) {
             if (!dateStr) return '';
 
-            const expiry = new Date(dateStr);
-            const now = new Date();
-            const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+            var expiry = new Date(dateStr);
+            var now = new Date();
+            var diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
 
             if (diffDays < 0) {
                 return '<span class="expiry-expired">หมดอายุแล้ว!</span>';
