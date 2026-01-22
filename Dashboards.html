@@ -1403,7 +1403,162 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-/* ================= UI : MODAL ================= */
+/* ================= FIREBASE INIT ================= */
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC_e4e5PVTVgGGUXNnxk_i0capzW1vUHAA",
+  authDomain: "wi-dashbord-app.firebaseapp.com",
+  projectId: "wi-dashbord-app",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ================= GLOBAL STATE (เดิม) ================= */
+let masterPasswordHash = null;
+let credentials = [];
+let branches = [];
+let currentFilter = 'all';
+let currentBranchFilter = 'all';
+let currentSearch = '';
+let currentView = 'dashboard';
+
+const STORE_REF = db.collection('password_managers').doc('main');
+
+/* ================= INIT ================= */
+document.getElementById('loginForm').addEventListener('submit', handleLogin);
+document.getElementById('credentialForm').addEventListener('submit', handleSaveCredential);
+document.getElementById('searchInput').addEventListener('input', e => {
+  currentSearch = e.target.value.toLowerCase();
+  renderCredentials();
+});
+
+/* ================= LOGIN ================= */
+async function handleLogin(e) {
+  e.preventDefault();
+  const password = masterPassword.value;
+  const hash = CryptoJS.SHA256(password).toString();
+
+  const snap = await STORE_REF.get();
+  if (!snap.exists) {
+    masterPasswordHash = hash;
+    await STORE_REF.set({
+      masterPasswordHash: hash,
+      credentials: encrypt('[]', password),
+      branches: [
+        'สำนักงานใหญ่','โรงงาน 1','โรงงาน 2',
+        'คลังสินค้า','สาขานครศรีธรรมราช','สาขาหาดใหญ่'
+      ],
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    loginSuccess(password);
+  } else {
+    if (snap.data().masterPasswordHash === hash) {
+      masterPasswordHash = hash;
+      loginSuccess(password);
+    } else {
+      showLoginAlert('รหัสผ่านไม่ถูกต้อง!', 'danger');
+    }
+  }
+}
+
+function loginSuccess(password) {
+  window.sessionPassword = password;
+  loginScreen.classList.add('hidden');
+  mainApp.classList.remove('hidden');
+  appFooter.classList.remove('hidden');
+  loadFromFirebase();
+}
+
+/* ================= ENCRYPT ================= */
+function encrypt(text, password) {
+  return CryptoJS.AES.encrypt(text, password).toString();
+}
+function decrypt(cipher, password) {
+  try {
+    return CryptoJS.AES.decrypt(cipher, password).toString(CryptoJS.enc.Utf8);
+  } catch {
+    return '';
+  }
+}
+
+/* ================= FIREBASE LOAD / SAVE ================= */
+async function loadFromFirebase() {
+  const snap = await STORE_REF.get();
+  if (!snap.exists) return;
+
+  const data = snap.data();
+  masterPasswordHash = data.masterPasswordHash;
+
+  const decrypted = decrypt(data.credentials, sessionPassword);
+  credentials = decrypted ? JSON.parse(decrypted) : [];
+  branches = data.branches || [];
+
+  updateBranchDropdowns();
+  renderDashboard();
+  renderCredentials();
+}
+
+async function saveCredentials() {
+  await STORE_REF.set({
+    credentials: encrypt(JSON.stringify(credentials), sessionPassword),
+    branches: branches,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+/* ================= CRUD (เดิม) ================= */
+function handleSaveCredential(e) {
+  e.preventDefault();
+  const id = credentialId.value || Date.now().toString();
+
+  const c = {
+    id,
+    branch: branch.value,
+    category: category.value,
+    title: title.value,
+    url: url.value,
+    username: username.value,
+    password: password.value,
+    notes: notes.value,
+    expiryDate: expiryDate.value,
+    updatedAt: new Date().toISOString()
+  };
+
+  const idx = credentials.findIndex(x => x.id === id);
+  if (idx >= 0) credentials[idx] = c;
+  else credentials.push(c);
+
+  saveCredentials();
+  renderDashboard();
+  renderCredentials();
+  closeModal();
+}
+
+function deleteCredential(id) {
+  if (!confirm('ยืนยันการลบข้อมูลนี้?')) return;
+  credentials = credentials.filter(c => c.id !== id);
+  saveCredentials();
+  renderDashboard();
+  renderCredentials();
+}
+
+/* ================= BRANCH ================= */
+function saveBranches() {
+  saveCredentials();
+}
+function loadBranches() {}
+/* (ใช้ Firestore ตัวเดียว ไม่ต้อง load ซ้ำ) */
+
+/* ================= LOGOUT ================= */
+function logout() {
+  sessionPassword = null;
+  loginScreen.classList.remove('hidden');
+  mainApp.classList.add('hidden');
+  appFooter.classList.add('hidden');
+}
+/* ================= UI0000 : MODAL ================= */
 function openAddModal() {
   document.getElementById('modalTitle').innerText = 'เพิ่มข้อมูลใหม่';
   document.getElementById('credentialForm').reset();
