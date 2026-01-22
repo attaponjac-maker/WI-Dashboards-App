@@ -1412,17 +1412,17 @@
   appId: "1:325067818741:web:b9c175922db57eaf5fa7bc"
 };
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);https://github.com/attaponjac-maker/WI-Dashboards-App/blob/main/index.html
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 /* ================= GLOBAL STATE ================= */
-let credentials = [];
-let branches = [];
-let currentFilter = 'all';
-let currentBranchFilter = 'all';
-let currentSearch = '';
-let currentView = 'dashboard';
+var credentials = [];
+var branches = [];
+var currentFilter = 'all';
+var currentBranchFilter = 'all';
+var currentSearch = '';
+var currentView = 'dashboard';
 
 /* ================= ENCRYPT ================= */
 function encrypt(text, password) {
