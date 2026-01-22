@@ -1558,6 +1558,24 @@ function logout() {
   mainApp.classList.add('hidden');
   appFooter.classList.add('hidden');
 }
+<script>
+/* ================= LOGIN ALERT ================= */
+function showLoginAlert(message, type = 'danger') {
+  const alertBox = document.getElementById('loginAlert');
+  if (!alertBox) return;
+
+  alertBox.innerHTML = `
+    <div class="alert alert-${type}">
+      ${message}
+    </div>
+  `;
+
+  setTimeout(() => {
+    alertBox.innerHTML = '';
+  }, 3000);
+}
+</script>
+
 /* ================= UI0000 : MODAL ================= */
 function openAddModal() {
   document.getElementById('modalTitle').innerText = 'เพิ่มข้อมูลใหม่';
