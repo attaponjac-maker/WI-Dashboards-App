@@ -819,6 +819,109 @@
 <!-- ================= MAIN APP (เดิม) ================= -->
 <div id="mainApp" class="hidden">
   <!-- โครงทั้งหมดของคุณอยู่ตรงนี้เหมือนเดิม -->
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h1>🔐 IT Password Manager</h1>
+                    <p style="margin: 0; color: var(--text-light); font-size: 14px;">
+                        จัดการรหัสผ่านและข้อมูล IT Infrastructure
+                    </p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="openAddModal()">
+                        ➕ เพิ่มข้อมูล
+                    </button>
+                    <button class="btn btn-warning" onclick="exportData()">
+                        💾 Export
+                    </button>
+                    <button class="btn btn-secondary" onclick="importData()">
+                        📁 Import
+                    </button>
+                    <button class="btn btn-primary" onclick="openUserGuide()">
+                        📖 คู่มือการใช้งาน
+                    </button>
+                    <button class="btn btn-danger" onclick="logout()">
+                        🚪 ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <!-- View Tabs -->
+                <div class="view-tabs">
+                    <div class="view-tab active" onclick="switchView('dashboard')">
+                        📊 Dashboard
+                    </div>
+                    <div class="view-tab" onclick="switchView('credentials')">
+                        🔐 รายการรหัสผ่าน
+                    </div>
+                </div>
+
+                <!-- Dashboard View -->
+                <div id="dashboardView"></div>
+
+                <!-- Credentials View -->
+                <div id="credentialsView" class="hidden">
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="🔍 ค้นหา... (ชื่อ, URL, รายละเอียด)"
+                            style="flex: 1; margin: 0;">
+                        <button class="btn btn-secondary" onclick="clearSearch()">ล้าง</button>
+                    </div>
+
+                    <div class="category-tabs">
+                        <div class="tab active" data-category="all" onclick="filterCategory('all')">
+                            📋 ทั้งหมด
+                        </div>
+                        <div class="tab" data-category="google-workspace" onclick="filterCategory('google-workspace')">
+                            🌐 Google Workspace
+                        </div>
+                        <div class="tab" data-category="website" onclick="filterCategory('website')">
+                            💻 Website
+                        </div>
+                        <div class="tab" data-category="cctv" onclick="filterCategory('cctv')">
+                            📹 CCTV
+                        </div>
+                        <div class="tab" data-category="network" onclick="filterCategory('network')">
+                            🌐 Network
+                        </div>
+                        <div class="tab" data-category="server" onclick="filterCategory('server')">
+                            🖥️ Server
+                        </div>
+                        <div class="tab" data-category="etc" onclick="filterCategory('etc')">
+                            📦 อื่นๆ
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <label style="margin: 0; font-weight: 500;">🏢 กรองตามสาขา:</label>
+                        <select id="branchFilter" onchange="filterByBranch()" style="margin: 0; max-width: 300px;">
+                            <option value="all">-- ทุกสาขา --</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="openBranchManager()">
+                            ⚙️ จัดการสาขา
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credentials Grid -->
+            <div id="credentialsGrid" class="credentials-grid"></div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state hidden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <h3>ยังไม่มีข้อมูล</h3>
+                <p>เริ่มต้นด้วยการเพิ่มข้อมูลรหัสผ่านแรก</p>
+                <button class="btn btn-primary" onclick="openAddModal()" style="margin-top: 20px;">
+                    ➕ เพิ่มข้อมูลแรก
+                </button>
+            </div>
+        </div>
 </div>
 
 <div id="appFooter" class="hidden"></div>
