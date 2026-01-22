@@ -923,7 +923,431 @@
             </div>
         </div>
 </div>
+       <div id="credentialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">เพิ่มข้อมูลใหม่</h2>
+                <span class="close-btn" onclick="closeModal()">✕</span>
+            </div>
 
+            <form id="credentialForm">
+                <input type="hidden" id="credentialId">
+
+                <label>สาขา / Location *</label>
+                <select id="branch" required>
+                    <option value="">-- เลือกสาขา --</option>
+                </select>
+
+                <label>หมวดหมู่ *</label>
+                <select id="category" required>
+                    <option value="">-- เลือกหมวดหมู่ --</option>
+                    <option value="google-workspace">🌐 Google Workspace</option>
+                    <option value="website">💻 Website</option>
+                    <option value="cctv">📹 CCTV</option>
+                    <option value="network">🌐 Network</option>
+                    <option value="server">🖥️ Server</option>
+                    <option value="etc">📦 อื่นๆ</option>
+                </select>
+
+                <label>ชื่อระบบ/บริการ *</label>
+                <input type="text" id="title" placeholder="เช่น Gmail Admin, Domain GoDaddy" required>
+
+                <label>URL / IP Address</label>
+                <input type="text" id="url" placeholder="https://... หรือ 192.168.1.1">
+
+                <label>Username / Email</label>
+                <input type="text" id="username" placeholder="admin@company.com">
+
+                <label>Password</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="password" id="password" placeholder="รหัสผ่าน" style="margin: 0;">
+                    <button type="button" class="btn btn-secondary" onclick="generatePassword()">🎲</button>
+                    <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility()">👁️</button>
+                </div>
+
+                <label>หมายเหตุ / รายละเอียดเพิ่มเติม</label>
+                <textarea id="notes" rows="3" placeholder="ข้อมูลเพิ่มเติม, API Keys, Serial Number, ฯลฯ"></textarea>
+
+                <label>วันหมดอายุ (ถ้ามี)</label>
+                <input type="date" id="expiryDate">
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        💾 บันทึก
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        ❌ ยกเลิก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import File Input -->
+    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleImport(this)">
+
+    <!-- Branch Manager Modal -->
+    <div id="branchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏢 จัดการสาขา</h2>
+                <span class="close-btn" onclick="closeBranchModal()">✕</span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label>เพิ่มสาขาใหม่</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="newBranchName" placeholder="ชื่อสาขา เช่น สำนักงานใหญ่, โรงงาน 1"
+                        style="margin: 0; flex: 1;">
+                    <button class="btn btn-success" onclick="addBranch()">➕ เพิ่ม</button>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom: 10px;">รายการสาขาทั้งหมด</h3>
+                <div id="branchList"></div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeBranchModal()">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Guide Modal -->
+    <div id="userGuideModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>📖 คู่มือการใช้งาน IT Password Manager</h2>
+                <span class="close-btn" onclick="closeUserGuide()">✕</span>
+            </div>
+
+            <!-- Navigation -->
+            <div class="guide-nav">
+                <button class="guide-nav-btn" onclick="scrollToSection('intro')">🎯 เริ่มต้นใช้งาน</button>
+                <button class="guide-nav-btn" onclick="scrollToSection('add')">➕ เพิ่มข้อมูล</button>
+                <button class="guide-nav-btn" onclick="scrollToSection('search')">🔍 ค้นหา</button>
+                <button class="guide-nav-btn" onclick="scrollToSection('branch')">🏢 จัดการสาขา</button>
+                <button class="guide-nav-btn" onclick="scrollToSection('backup')">💾 สำรองข้อมูล</button>
+                <button class="guide-nav-btn" onclick="scrollToSection('security')">🔐 ความปลอดภัย</button>
+                <button class="guide-nav-btn" onclick="scrollToSection('faq')">❓ FAQ</button>
+            </div>
+
+            <div class="guide-content">
+                <!-- Introduction -->
+                <div id="intro" class="guide-section">
+                    <h3>🎯 เริ่มต้นใช้งาน</h3>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">1. เข้าสู่ระบบครั้งแรก</div>
+                        <div class="guide-step-desc">
+                            เมื่อเปิดแอปครั้งแรก ระบบจะให้คุณสร้าง <strong>Master Password</strong>
+                            ซึ่งเป็นรหัสผ่านหลักสำหรับเข้าใช้งานระบบ
+                        </div>
+                    </div>
+
+                    <div class="guide-warning">
+                        <div class="guide-warning-title">⚠️ คำเตือนสำคัญ!</div>
+                        <div style="font-size: 14px;">
+                            หาก<strong>ลืม Master Password</strong> จะไม่สามารถเข้าถึงข้อมูลได้
+                            เนื่องจากระบบเข้ารหัสด้วย AES-256 และไม่มีฟังก์ชัน "ลืมรหัสผ่าน"
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">2. หน้า Dashboard</div>
+                        <div class="guide-step-desc">
+                            หลังล็อกอินสำเร็จ จะเห็นหน้า Dashboard แสดง:
+                            <ul style="margin-top: 8px; margin-left: 20px;">
+                                <li>จำนวนรายการทั้งหมด</li>
+                                <li>จำนวนสาขา</li>
+                                <li>รายการใกล้หมดอายุ และหมดอายุแล้ว</li>
+                                <li>กราฟแยกตามหมวดหมู่และสาขา</li>
+                                <li>รายการอัปเดตล่าสุด</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">3. สลับมุมมอง</div>
+                        <div class="guide-step-desc">
+                            ใช้ Tab ด้านบน:
+                            <br>📊 <strong>Dashboard</strong> - ดูภาพรวมและสถิติ
+                            <br>🔐 <strong>รายการรหัสผ่าน</strong> - ดูและจัดการรายการทั้งหมด
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Data -->
+                <div id="add" class="guide-section">
+                    <h3>➕ เพิ่มข้อมูลใหม่</h3>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">1. คลิกปุ่ม "➕ เพิ่มข้อมูล"</div>
+                        <div class="guide-step-desc">
+                            จะเปิดฟอร์มกรอกข้อมูล มีฟิลด์ดังนี้:
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg); padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <strong>ฟิลด์ที่ต้องกรอก (Required):</strong>
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>🏢 <strong>สาขา</strong> - เลือกสาขาที่ข้อมูลนี้สังกัด</li>
+                            <li>📋 <strong>หมวดหมู่</strong> - Google Workspace, Website, CCTV, Network, Server, อื่นๆ
+                            </li>
+                            <li>📝 <strong>ชื่อระบบ/บริการ</strong> - เช่น "Gmail Admin", "Router Main Office"</li>
+                        </ul>
+
+                        <strong style="margin-top: 10px; display: block;">ฟิลด์เสริม (Optional):</strong>
+                        <ul style="margin-top: 8px; margin-left: 20px;">
+                            <li>🌐 URL / IP Address</li>
+                            <li>👤 Username / Email</li>
+                            <li>🔑 Password</li>
+                            <li>📝 หมายเหตุ (API Keys, Serial Number, ฯลฯ)</li>
+                            <li>📅 วันหมดอายุ (Domain, SSL, License)</li>
+                        </ul>
+                    </div>
+
+                    <div class="guide-tip">
+                        <div class="guide-tip-title">💡 เคล็ดลับ:</div>
+                        <div style="font-size: 14px;">
+                            • ใช้ปุ่ม <strong>🎲</strong> เพื่อสร้างรหัสผ่านแบบสุ่ม (16 ตัวอักษร)<br>
+                            • ใช้ปุ่ม <strong>👁️</strong> เพื่อแสดง/ซ่อนรหัสผ่าน<br>
+                            • กรอก URL เป็น https://... หรือ IP Address เช่น 192.168.1.1
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search & Filter -->
+                <div id="search" class="guide-section">
+                    <h3>🔍 ค้นหาและกรองข้อมูล</h3>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">1. ค้นหาด้วยคำสำคัญ</div>
+                        <div class="guide-step-desc">
+                            พิมพ์คำค้นในช่อง "🔍 ค้นหา..." จะค้นหาใน:
+                            <ul style="margin-top: 8px; margin-left: 20px;">
+                                <li>ชื่อระบบ/บริการ</li>
+                                <li>URL / IP Address</li>
+                                <li>Username</li>
+                                <li>หมายเหตุ</li>
+                                <li>ชื่อสาขา</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">2. กรองตามหมวดหมู่</div>
+                        <div class="guide-step-desc">
+                            คลิกที่ Tab หมวดหมู่เพื่อแสดงเฉพาะหมวดนั้น:
+                            <br>🌐 Google Workspace | 💻 Website | 📹 CCTV | 🌐 Network | 🖥️ Server | 📦 อื่นๆ
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">3. กรองตามสาขา</div>
+                        <div class="guide-step-desc">
+                            เลือกสาขาจาก Dropdown "🏢 กรองตามสาขา" เพื่อแสดงเฉพาะข้อมูลของสาขานั้น
+                        </div>
+                    </div>
+
+                    <div class="guide-tip">
+                        <div class="guide-tip-title">💡 เคล็ดลับ:</div>
+                        <div style="font-size: 14px;">
+                            สามารถใช้การค้นหา + กรองหมวดหมู่ + กรองสาขา พร้อมกันได้!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Branch Management -->
+                <div id="branch" class="guide-section">
+                    <h3>🏢 จัดการสาขา</h3>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">1. เปิดหน้าจัดการสาขา</div>
+                        <div class="guide-step-desc">
+                            คลิกปุ่ม "⚙️ จัดการสาขา" ในส่วนกรองข้อมูล
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">2. เพิ่มสาขาใหม่</div>
+                        <div class="guide-step-desc">
+                            • พิมพ์ชื่อสาขา เช่น "สำนักงานใหญ่", "โรงงาน 1", "สาขาหาดใหญ่"<br>
+                            • คลิก "➕ เพิ่ม"<br>
+                            • สาขาใหม่จะปรากฏใน Dropdown ทันที
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">3. ลบสาขา</div>
+                        <div class="guide-step-desc">
+                            • คลิกปุ่ม "🗑️ ลบ" ข้างชื่อสาขา<br>
+                            • หากมีข้อมูลใช้งานอยู่ ระบบจะเตือน<br>
+                            • ข้อมูลที่มีอยู่จะไม่หายไป แต่จะไม่มีสาขาแนบอยู่
+                        </div>
+                    </div>
+
+                    <div class="guide-tip">
+                        <div class="guide-tip-title">💡 สาขาเริ่มต้น:</div>
+                        <div style="font-size: 14px;">
+                            ระบบมีสาขาเริ่มต้น: สำนักงานใหญ่, โรงงาน 1, โรงงาน 2, คลังสินค้า,
+                            สาขานครศรีธรรมราช, สาขาหาดใหญ่
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup -->
+                <div id="backup" class="guide-section">
+                    <h3>💾 สำรองและกู้คืนข้อมูล</h3>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">1. Export ข้อมูล (สำรอง)</div>
+                        <div class="guide-step-desc">
+                            • คลิกปุ่ม "💾 Export"<br>
+                            • ระบบจะดาวน์โหลดไฟล์ JSON<br>
+                            • เก็บไฟล์นี้ไว้ในที่ปลอดภัย (USB, Cloud Storage)
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">2. Import ข้อมูล (กู้คืน)</div>
+                        <div class="guide-step-desc">
+                            • คลิกปุ่ม "📁 Import"<br>
+                            • เลือกไฟล์ JSON ที่ Export ไว้<br>
+                            • ยืนยันการนำเข้า<br>
+                            • ข้อมูลจะถูกกู้คืนทั้งหมด
+                        </div>
+                    </div>
+
+                    <div class="guide-warning">
+                        <div class="guide-warning-title">⚠️ ข้อควรระวัง!</div>
+                        <div style="font-size: 14px;">
+                            • สำรองข้อมูลเป็นประจำ (แนะนำ: สัปดาห์ละครั้ง)<br>
+                            • เก็บไฟล์ Backup หลายที่<br>
+                            • การ Import จะเขียนทับข้อมูลเดิมทั้งหมด
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div id="security" class="guide-section">
+                    <h3>🔐 ความปลอดภัย</h3>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">การเข้ารหัส</div>
+                        <div class="guide-step-desc">
+                            ระบบใช้ <strong>AES-256 Encryption</strong> เข้ารหัสข้อมูลทั้งหมด<br>
+                            ข้อมูลเก็บใน Browser localStorage แบบเข้ารหัส
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">Auto-Clear Clipboard</div>
+                        <div class="guide-step-desc">
+                            เมื่อคัดลอกรหัสผ่าน ระบบจะล้าง Clipboard อัตโนมัติหลัง <strong>30 วินาที</strong>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">ข้อแนะนำความปลอดภัย</div>
+                        <div class="guide-step-desc">
+                            ✓ ใช้ Master Password ที่แข็งแรง (12+ ตัวอักษร)<br>
+                            ✓ ไม่แชร์ Master Password กับผู้อื่น<br>
+                            ✓ ออกจากระบบทุกครั้งเมื่อใช้งานเสร็จ<br>
+                            ✓ ใช้งานบนคอมพิวเตอร์ที่เชื่อถือได้<br>
+                            ✓ สำรองข้อมูลเป็นประจำ
+                        </div>
+                    </div>
+
+                    <div class="guide-warning">
+                        <div class="guide-warning-title">⚠️ ข้อจำกัด!</div>
+                        <div style="font-size: 14px;">
+                            • ระบบทำงานบน Client-Side (ไม่มี Server)<br>
+                            • ข้อมูลเก็บใน Browser เครื่องนั้นๆ เท่านั้น<br>
+                            • ล้างข้อมูล Browser = สูญเสียข้อมูลทั้งหมด (หากไม่มี Backup)<br>
+                            • ไม่มีระบบกู้คืน Master Password
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div id="faq" class="guide-section">
+                    <h3>❓ คำถามที่พบบ่อย (FAQ)</h3>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">Q: ลืม Master Password ทำอย่างไร?</div>
+                        <div class="guide-step-desc">
+                            <strong>A:</strong> ไม่สามารถกู้คืนได้ ต้องล้างข้อมูลและเริ่มใหม่
+                            (กด F12 → Console → พิมพ์ <code>localStorage.clear()</code>)
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">Q: ใช้งานได้กี่คน?</div>
+                        <div class="guide-step-desc">
+                            <strong>A:</strong> 1 คนต่อ 1 Browser เท่านั้น เพราะข้อมูลเก็บใน Browser ของแต่ละเครื่อง
+                            หากต้องการใช้ร่วมกันหลายคน ควร Host บน Server + ใช้ Database
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">Q: ข้อมูลปลอดภัยแค่ไหน?</div>
+                        <div class="guide-step-desc">
+                            <strong>A:</strong> เข้ารหัสด้วย AES-256 ปลอดภัยมาก แต่ปลอดภัยที่สุด =
+                            ใช้ Master Password ที่แข็งแรง + ออกจากระบบทุกครั้ง
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">Q: สามารถเปลี่ยน Master Password ได้ไหม?</div>
+                        <div class="guide-step-desc">
+                            <strong>A:</strong> เวอร์ชันนี้ยังไม่มีฟังก์ชันนี้ หากต้องการเปลี่ยน:
+                            <br>1. Export ข้อมูลทั้งหมด
+                            <br>2. ล้างข้อมูล (localStorage.clear())
+                            <br>3. สร้าง Master Password ใหม่
+                            <br>4. Import ข้อมูลกลับเข้ามา
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-title">Q: ใช้งานบนมือถือได้ไหม?</div>
+                        <div class="guide-step-desc">
+                            <strong>A:</strong> ได้! รองรับ Responsive Design แต่แนะนำใช้บนคอมพิวเตอร์
+                            สำหรับการจัดการจำนวนมาก
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="guide-section">
+                    <h3>💡 เคล็ดลับการใช้งาน</h3>
+
+                    <div class="guide-tip">
+                        <div style="font-size: 14px;">
+                            <strong>สำหรับผู้ดูแลระบบ IT:</strong><br>
+                            • แยกข้อมูลตามสาขาให้ชัดเจน<br>
+                            • ใส่วันหมดอายุสำหรับ Domain, SSL, License<br>
+                            • ตรวจสอบ Dashboard เป็นประจำเพื่อดูรายการหมดอายุ<br>
+                            • Export สำรองทุกสัปดาห์<br>
+                            • ใช้หมายเหตุเก็บ API Keys, Serial Numbers<br><br>
+
+                            <strong>สำหรับองค์กร:</strong><br>
+                            • Host บน Internal Server สำหรับความปลอดภัย<br>
+                            • ตั้ง Master Password แยกตามแผนก/ทีม<br>
+                            • มีนโยบายสำรองข้อมูลที่ชัดเจน
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-primary" onclick="closeUserGuide()">
+                    ✅ เข้าใจแล้ว ปิดคู่มือ
+                </button>
+            </div>
+        </div>
+    </div>
 <div id="appFooter" class="hidden"></div>
 
 <!-- ================= LIBRARIES ================= -->
