@@ -1579,6 +1579,7 @@ function openAddModal() {
   document.getElementById('modalTitle').innerText = 'เพิ่มข้อมูลใหม่';
   document.getElementById('credentialForm').reset();
   document.getElementById('credentialId').value = '';
+  updateBranchDropdowns();
   document.getElementById('credentialModal').classList.add('active');
 }
 
@@ -1938,15 +1939,21 @@ function deleteBranch(i) {
   updateBranchDropdowns();
   renderBranchList();
 }
+	
 function updateBranchDropdowns() {
-  branch.innerHTML = '<option value="">-- เลือกสาขา --</option>';
-  branchFilter.innerHTML = '<option value="all">-- ทุกสาขา --</option>';
-  branches.forEach(b => {
-    branch.innerHTML += `<option value="${b}">${b}</option>`;
-    branchFilter.innerHTML += `<option value="${b}">${b}</option>`;
-  });
-}
+  const filterSelect = document.getElementById('branchFilter');
+  const branchSelect = document.getElementById('branch');
 
+  if (!filterSelect || !branchSelect) return;
+
+  filterSelect.innerHTML =
+    '<option value="all">-- ทุกสาขา --</option>' +
+    branches.map(b => `<option value="${b}">${b}</option>`).join('');
+
+  branchSelect.innerHTML =
+    '<option value="">-- เลือกสาขา --</option>' +
+    branches.map(b => `<option value="${b}">${b}</option>`).join('');
+}
 /* ================= OTHER ================= */
 function editCredential(id) {
   const c = credentials.find(x => x.id === id);
